@@ -1,0 +1,37 @@
+<html>
+<head>
+    <title>WDC Sản Phẩm</title>
+    <script src="https://connectors.tableau.com/libs/tableauwdc-2.3.latest.js" type="text/javascript"></script>
+    <script>
+        (function () {
+            var myConnector = tableau.makeConnector();
+            myConnector.getSchema = function (schemaCallback) {
+                var cols = [
+                    { id: "ID", dataType: tableau.dataTypeEnum.int },
+                    { id: "ma_san_pham", dataType: tableau.dataTypeEnum.string },
+                    { id: "ten_san_pham", dataType: tableau.dataTypeEnum.string },
+                    { id: "don_gia", dataType: tableau.dataTypeEnum.float }
+                ];
+                var tableSchema = { id: "tbl_SAN_PHAM", alias: "Sản phẩm", columns: cols };
+                schemaCallback([tableSchema]);
+            };
+            myConnector.getData = function (table, doneCallback) {
+                fetch('http://localhost:5000/api/V2/sanpham')
+                    .then(response => response.json())
+                    .then(data => {
+                        table.appendRows(data);
+                        doneCallback();
+                    });
+            };
+            tableau.registerConnector(myConnector);
+        })();
+    </script>
+</head>
+<body style="font-family: Arial; text-align: center; padding-top: 50px;">
+    <h2>Kết nối SQL Server với Tableau Public</h2>
+    <h2>Table sản phẩm: tbl_SAN_PHAM</h2>
+    <button onclick="tableau.submit()" style="padding:10px; background:#2ecc71; color:white; border:none; border-radius:5px; cursor:pointer;">
+        Get Data: "Sản Phẩm"
+    </button>
+</body>
+</html>

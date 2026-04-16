@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WDC - SQL Server and Tableau Public Edition</title>
+    <script src="https://connectors.tableau.com/libs/tableauwdc-2.3.latest.js"></script>
+    <script>
+    (function() {
+        var myConnector = tableau.makeConnector();
+
+        // Định nghĩa cấu trúc bảng (Schema)
+        myConnector.getSchema = function(schemaCallback) {
+            var cols = [
+                { id: "id", alias: "id", dataType: tableau.dataTypeEnum.int },
+                { id: "ngay", alias: "Ngày", dataType: tableau.dataTypeEnum.string },
+                { id: "doanh_so", alias: "Doanh số", dataType: tableau.dataTypeEnum.int }
+                // Lưu ý: Tên 'id' phải khớp chính xác với tên cột trong SQL
+            ];
+
+            var tableSchema = {
+                id: "SQLServerData",
+                alias: "SQL_DoanhSo",
+                columns: cols
+            };
+            schemaCallback([tableSchema]);
+        };
+
+        // Lấy dữ liệu từ API Python
+        myConnector.getData = function(table, doneCallback) {
+            fetch('http://127.0.0.1:5000/get-doanhso') // Đảm bảo URL này khớp với endpoint API của bạn Python
+                .then(response => response.json())
+                .then(data => {
+                    table.appendRows(data);
+                    doneCallback();
+                });
+        };
+
+        tableau.registerConnector(myConnector);
+
+        window.onload = function() {
+            document.getElementById("submitButton").onclick = function() {
+                tableau.connectionName = "SQL Data Source";
+                tableau.submit();
+            };
+        };
+    })();
+    </script>
+</head>
+<body style="font-family: Arial; text-align: center; padding-top: 50px;">
+    <h2>Kết nối SQL Server với Tableau Public</h2>
+    <h2>Table doanh số: Table_2</h2>
+    <button id="submitButton" style="padding: 15px 30px; cursor: pointer;">Tải Dữ Liệu</button>
+</body>
+</html>

@@ -16,8 +16,16 @@
                 schemaCallback([tableSchema]);
             };
             myConnector.getData = function (table, doneCallback) {
-                fetch('http://localhost:5000/api/V2/khachhang')
-                    .then(response => response.json())
+                // Gọi API để lấy dữ liệu sản phẩm
+                // Địa chỉ IP máy server, máy có cài đặt 
+                //  - Python, 
+                //  - Flask và chạy API
+                //  - Trang web data connector - frontend
+                // IP máy server có thể khác với IP máy cài Tableau Public 
+                // sau đây là IP ví dụ (192.168.1.8), và khác với IP máy cài Tableau Public
+                // fetch('http://localhost:5000/api/V2/khachhang')
+                fetch('http://192.168.1.8:5000/api/V2/khachhang')
+                .then(response => response.json())
                     .then(data => {
                         table.appendRows(data);
                         doneCallback();

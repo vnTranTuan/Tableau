@@ -1,9 +1,21 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import pyodbc
+import socket
 
 app = Flask(__name__)
 CORS(app) # Cho phép Tableau truy cập API từ trình duyệt
+
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+    except:
+        ip = "127.0.0.1"
+    finally:
+        s.close()
+    return ip
 
 # # Cấu hình kết nối SQL Server, với internet IP và port
 def get_sql_connection():
@@ -55,6 +67,7 @@ def fetch_data(query):
 @app.route('/api/V2/sanpham', methods=['GET'])
 def get_sanpham():
     data = fetch_data("SELECT ID, ma_san_pham, ten_san_pham, don_gia FROM tbl_SAN_PHAM")
+    print(data)
     return jsonify(data)
 
 @app.route('/api/V2/doanhso', methods=['GET'])
@@ -74,5 +87,5 @@ def get_orders():
 
 if __name__ == '__main__':
     # Chạy Server tại port 5000
-    print("API Server đang chạy tại http://localhost:5000")
+    print(f"API Server đang chạy tại http://{get_local_ip()}:5000")
     app.run(host='0.0.0.0', port=5000, debug=True)
